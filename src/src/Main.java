@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyPair;
 import java.security.Security;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -20,7 +21,7 @@ public class Main {
 	private static X509Certificate certSer;
 	private static KeyPair keyPairServidor;
 
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args) throws IOException, CertificateException{
 		System.out.println("CLIENTE: Conectando al servidor:");
 		Socket socket=null;
 		PrintWriter escritor=null;
@@ -35,7 +36,8 @@ public class Main {
 
 		try {
 			System.out.println("CLIENTE: Conectando al servidor "+SERVIDOR+" en el puerto "+PUERTO);
-			Socket sc = new Socket(SERVIDOR,PUERTO);
+			socket = new Socket(SERVIDOR,PUERTO);
+			System.out.println("aaa");
 			escritor=new PrintWriter(socket.getOutputStream(),true);
 			lector=new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		}
