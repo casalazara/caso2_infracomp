@@ -6,10 +6,17 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -18,10 +25,9 @@ public class Main {
 	public final static int PUERTO=3400;
 	public final static String SERVIDOR="localhost";
 
-	private static X509Certificate certSer;
-	private static KeyPair keyPairServidor;
+	public static void main(String[] args) throws IOException, CertificateException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+		Security.addProvider((Provider)new BouncyCastleProvider());
 
-	public static void main(String[] args) throws IOException, CertificateException{
 		System.out.println("CLIENTE: Conectando al servidor:");
 		Socket socket=null;
 		PrintWriter escritor=null;
@@ -54,7 +60,7 @@ public class Main {
 		//					System.out.println("MAESTRO: Error creando el socket cliente.");
 		//					var7.printStackTrace();
 		//				}
-		
+
 		BufferedReader stdIn=new BufferedReader(new InputStreamReader(System.in));
 		ProtocoloCliente.procesar(stdIn,lector,escritor);
 		stdIn.close();
