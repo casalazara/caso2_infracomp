@@ -41,9 +41,7 @@ public class Main {
 			System.exit(-1);
 		}
 
-		BufferedReader stdIn=new BufferedReader(new InputStreamReader(System.in));
-		ProtocoloCliente.procesar(stdIn,lector,escritor);
-		stdIn.close();
+		ProtocoloCliente.procesar(lector,escritor);
 		escritor.close();
 		lector.close();
 		socket.close();

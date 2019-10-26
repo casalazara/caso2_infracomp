@@ -11,6 +11,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Scanner;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -33,13 +34,14 @@ public class ProtocoloCliente {
 
 	private static X509Certificate certSer;
 	private static SecretKey sk;
+	private static Scanner scan=new Scanner(System.in);
 
 	public ProtocoloCliente()
 	{	 
 		estadoActual=0;
 	}
 
-	public static void procesar(BufferedReader stdIn,BufferedReader pIn,PrintWriter pOut)throws IOException, CertificateException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException
+	public static void procesar(BufferedReader pIn,PrintWriter pOut)throws IOException, CertificateException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException
 	{
 		//Empiezo la comunicación
 		pOut.println(HOLA);
@@ -86,7 +88,8 @@ public class ProtocoloCliente {
 
 
 				//Envio reto
-				rta="casa";
+				System.out.println("Por favor ingrese el reto a enviar:");
+				rta=leerConsola();
 				pOut.println(rta);
 				System.out.println("cliente envió reto-" + rta + "-continuando.");
 
@@ -106,17 +109,20 @@ public class ProtocoloCliente {
 				else 
 				{
 					rta=ERROR;
+					System.out.println("Hubo un error verificando reto, no coinciden.");
 				}
 				//Confirmo si recibí bien o no
 				pOut.println(rta);
 
 				//Envío la cédula
-				rta=cifrarSimetrico("001005755560",AES);
+				System.out.println("Por favor oprima enter e ingrese la cédula a enviar:");
+				rta=cifrarSimetrico(leerConsola(),AES);
 				pOut.println(rta);
 				System.out.println("cliente envió cédula-" + rta + "-continuando.");
 
 				//Envío la clave
-				rta=cifrarSimetrico("conTraSeNaS3GuR4",AES);
+				System.out.println("Por favor oprima enter e ingrese la contraseña a enviar:");
+				rta=cifrarSimetrico(leerConsola(),AES);
 				pOut.println(rta);
 				System.out.println("cliente envió contraseña-" + rta + "-continuando.");
 
@@ -151,23 +157,29 @@ public class ProtocoloCliente {
 					rta=ERROR;
 				}
 				pOut.println(rta);
+
 				//Termina la conexión.
 				System.out.println("Conexión terminada con "+rta+".");
-
+				scan.close();
 			}
 		}
 	}
 
-	public static String cifrarSimetrico(String mensaje, String algoritmo) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException
+	public static String leerConsola() throws IOException
 	{
+		String mensaje=scan.nextLine();
 		if(mensaje.length()%4!=0)
 			for(int i=0;i<mensaje.length()%4;i++)
 				mensaje+="0";
+		return mensaje;
+	}
+
+	public static String cifrarSimetrico(String mensaje, String algoritmo) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException
+	{
+		mensaje=leerConsola();
 		Cipher cifradorAES=Cipher.getInstance(AES);
 		cifradorAES.init(Cipher.ENCRYPT_MODE,sk);
 		byte[] ba=cifradorAES.doFinal(DatatypeConverter.parseBase64Binary(mensaje));
 		return DatatypeConverter.printBase64Binary(ba);
 	}
-
-
 }
